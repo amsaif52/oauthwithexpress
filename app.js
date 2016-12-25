@@ -13,11 +13,31 @@ var routes = require('./routes/index');
 var User = require('./models/user');
 var app = express();
 
+passport.serializeUser(function(user, done) {
+  done(null, user._id);
+});
+
+passport.deserializeUser(function(userId, done) {
+  User.findById(userId, done);
+});
+
 var port = process.env.PORT || 3000;
 mongoose.connect("mongodb://localhost:27017/bookworm-oauth");
 var db = mongoose.connection;
 
 db.on('error',console.error.bind(console,"connection error:"))
+
+app.use(session({
+	secret: 'random bookworm-oauth',
+	resave: true,
+	saveUninitialized: true,
+	store: new MongoStore({
+		mongooseConnection: db
+	})
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.set('view engine','pug');
 app.set('views', path.join(__dirname + '/views'));
