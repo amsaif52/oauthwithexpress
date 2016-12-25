@@ -10,6 +10,7 @@ var express = require('express');
 	mongoStore = require('connect-mongo')(session);
 
 var routes = require('./routes/index');
+var User = require('./models/user');
 var app = express();
 
 var port = process.env.PORT || 3000;
