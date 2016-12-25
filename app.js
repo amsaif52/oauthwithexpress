@@ -13,6 +13,16 @@ var routes = require('./routes/index');
 var User = require('./models/user');
 var app = express();
 
+app.set('view engine','pug');
+app.set('views', path.join(__dirname + '/views'));
+app.use('/static', express.static(path.join(__dirname+'/public')));
+app.use(favicon(__dirname + '/public/favicon.ico'));
+
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
+
 passport.serializeUser(function(user, done) {
   done(null, user._id);
 });
@@ -31,7 +41,7 @@ app.use(session({
 	secret: 'random bookworm-oauth',
 	resave: true,
 	saveUninitialized: true,
-	store: new MongoStore({
+	store: new mongoStore({
 		mongooseConnection: db
 	})
 }));
@@ -39,15 +49,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.set('view engine','pug');
-app.set('views', path.join(__dirname + '/views'));
-
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(cookieParser());
-
-app.set('/static', express.static(path.join(__dirname+'/public')));
 app.use('/', routes);
 
 app.use(function(req,res,next){
